@@ -1,0 +1,43 @@
+user: redvulture            # Username of your Gerrit user
+host: LAPTOP-RAP26UIP  # Host where your Gerrit instance is located
+port: 29418               # Port the custom Gerrit SSH daemon is listening on
+
+# Remotes to add when running `gerrit setup`. Note that %{...} values are
+# interpolated using the values above--you do not need to fill them in yourself.
+remotes:
+  # When updating your local repo, all commits are pulled down from this remote.
+  # This is also used when force-pushing commits or seeding a Gerrit repo
+  # initially (though you'll need to give the respective user force-push permissions)
+  origin:
+    url: ssh://%{user}@%{host}:%{port}/%{project}.git
+    push: HEAD:refs/heads/master
+  # Used for pushing commits out for review.
+  # While you should use `gerrit push`, this allows you to run `git push gerrit`.
+  gerrit:
+    url: ssh://%{user}@%{host}:%{port}/%{project}.git
+    push: HEAD:refs/publish/master
+  # Used to pull down from a repo mirror--in this example GitHub.
+  # This is mostly to check that replication from Gerrit to the mirror is working.
+  # You should not be pushing to this directly (hence why it has no push spec).
+  github:
+    url: git@github.com:my-organization/%{project}.git
+
+# Use this remote (from the list above) to push commits out for review
+push_remote: gerrit
+
+# Run this script after running `gerrit setup` or `gerrit clone` to perform
+# some automatic setup (e.g. install git hooks). It is run with the repo root
+# as your working directory. The following example installs Overcommit hooks
+# if an Overcommit configuration file exists.
+# post_setup: ['bash', '-c',
+#   '[ -f .overcommit.yml ] && ((which overcommit >/dev/null || gem install overcommit); overcommit --install)'
+# ]
+
+# Groups to get users from when searching for "all" users. This is necessary
+# when a user could potentially be in many groups, since the tool will check
+# the memberships of all that user's groups in order to find potential matches.
+user_search_groups:
+  - 'Registered Users'
+
+# Require command-line consent to push a review to this many reviewers:
+warn_reviewer_count: 4
